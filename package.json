@@ -1,0 +1,24 @@
+{
+  "name": "ecr-deploy-test",
+  "version": "1.0.0",
+  "description": "My repository for AWS ECR application deploy testing",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PinkyRabbit/ecr-deploy-test.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PinkyRabbit/ecr-deploy-test/issues"
+  },
+  "homepage": "https://github.com/PinkyRabbit/ecr-deploy-test#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "hbs": "^4.1.1"
+  }
+}

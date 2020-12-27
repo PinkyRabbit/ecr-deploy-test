@@ -1,0 +1,11 @@
+# git
+.git
+.github
+.gitignore
+# default
+node_modules
+*Dockerfile*
+*docker-compose*
+# misc
+LICENSE
+README.md
