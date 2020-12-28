@@ -35,10 +35,12 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login_to_ecr.outputs.registry }}
           ECR_REPOSITORY: ${{ env.ecr_repository }}-pub
+          DBG: ${{ steps.login_to_ecr.outputs }}
           IMAGE_TAG: "${{ github.sha }}"
           DOCKERFILE: ${{ env.dockerfile }}
         run: |
           # Build a docker container and push it to ECR
+          echo $DBG
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY -f $DOCKERFILE .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY
           docker tag $ECR_REGISTRY/$ECR_REPOSITORY:latest $ECR_REGISTRY/$ECR_REPOSITORY:latest
