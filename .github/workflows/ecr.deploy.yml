@@ -34,7 +34,7 @@ jobs:
       - name: Build and Push Docker image
         env:
           ECR_REGISTRY: ${{ steps.login_to_ecr.outputs.registry }}
-          ECR_REPOSITORY: ${{ env.ecr_repository }} + "-pub"
+          ECR_REPOSITORY: ${{ env.ecr_repository }}-pub
           IMAGE_TAG: "${{ github.sha }}"
           DOCKERFILE: ${{ env.dockerfile }}
         run: |
