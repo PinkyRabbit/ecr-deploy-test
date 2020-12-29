@@ -27,20 +27,33 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_ECR_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.aws_region }}
 
-      - name: Login to Amazon ECR
-        id: login_to_ecr
-        uses: aws-actions/amazon-ecr-login@v1
-
-      - name: Build, tag, and push webapp image
-        id: build-image
+      - name: public ECR
         env:
-          ECR_REGISTRY: ${{ steps.login_to_ecr.outputs.registry }}
-          ECR_REPOSITORY: ${{ env.ecr_repository }}-pub
           IMAGE_TAG: "${{ github.sha }}"
+          ECR_REPOSITORY: ${{ env.ecr_repository }}-pub
           DOCKERFILE: ${{ env.dockerfile }}
+          ALIAS: w6x7i9z5
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f $DOCKERFILE .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
-          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/$ALIAS
+          docker build -t $ECR_REPOSITORY:$IMAGE_TAG -f $DOCKERFILE .
+          docker tag $ECR_REPOSITORY:$IMAGE_TAG public.ecr.aws/$ALIAS/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push public.ecr.aws/$ALIAS/$ECR_REPOSITORY:$IMAGE_TAG
+
+      # Private ECR part
+      # - name: Login to Amazon ECR
+      #   id: login_to_ecr
+      #   uses: aws-actions/amazon-ecr-login@v1
+
+      # - name: Private ECR
+      #   id: build-image
+      #   env:
+      #     ECR_REGISTRY: ${{ steps.login_to_ecr.outputs.registry }}
+      #     ECR_REPOSITORY: ${{ env.ecr_repository }}-pub
+      #     IMAGE_TAG: "${{ github.sha }}"
+      #     DOCKERFILE: ${{ env.dockerfile }}
+      #   run: |
+      #     docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f $DOCKERFILE .
+      #     docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+      #     docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
+      #     docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+      #     echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
