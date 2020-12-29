@@ -55,12 +55,13 @@ jobs:
         env:
           IMAGE_TAG: "${{ github.sha }}"
           ECR_REPOSITORY: ${{ env.ecr_repository }}-pub
+          PUBLIC_ECR: ${{ steps.ecr.outputs.account }}.dkr.ecr.${{ env.aws_region }}.amazonaws.com
           DOCKERFILE: ${{ env.dockerfile }}
           ALIAS: ${{ env.ecr_public_alias }}
         run: |
-          docker build -t $ECR_REPOSITORY:$IMAGE_TAG -f $DOCKERFILE .
-          docker tag $ECR_REPOSITORY:$IMAGE_TAG public.ecr.aws/$ALIAS/$ECR_REPOSITORY:$IMAGE_TAG
-          docker push public.ecr.aws/$ALIAS/$ECR_REPOSITORY:$IMAGE_TAG
+          docker build -t $PUBLIC_ECR:$IMAGE_TAG -f $DOCKERFILE .
+          docker tag $PUBLIC_ECR:$IMAGE_TAG $PUBLIC_ECR/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $PUBLIC_ECR/$ECR_REPOSITORY:$IMAGE_TAG
 
       # Private ECR part
       # - name: Login to Amazon ECR
