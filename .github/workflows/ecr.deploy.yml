@@ -32,24 +32,23 @@ jobs:
           unzip awscliv2.zip
           sudo ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
 
-      # - name: Login to ECR
-      #   id: ecr
-      #   uses: jwalton/gh-ecr-login@v1
-      #   with:
-      #     access-key-id: ${{ secrets.AWS_ECR_ACCESS_KEY_ID }}
-      #     secret-access-key: ${{ secrets.AWS_ECR_SECRET_ACCESS_KEY }}
-      #     region: ${{ env.aws_region }}
+      - name: Login to ECR
+        id: ecr
+        uses: jwalton/gh-ecr-login@v1
+        with:
+          access-key-id: ${{ secrets.AWS_ECR_ACCESS_KEY_ID }}
+          secret-access-key: ${{ secrets.AWS_ECR_SECRET_ACCESS_KEY }}
+          region: ${{ env.aws_region }}
 
       - name: Login to public ECR
         id: login-ecr
         env:
-            REGION: ${{ env.aws_region }}
-            ALIAS: ${{ env.ecr_public_alias }}
-            ACCOUNT_ID: ${{ steps.ecr.outputs.account }}
+          REGION: ${{ env.aws_region }}
+          ALIAS: ${{ env.ecr_public_alias }}
+          ACCOUNT_ID: ${{ steps.ecr.outputs.account }}
         run: |
-          aws ecr get-login-password --no-include-email --region $REGION | docker login -u AWS --password-stdin public.ecr.aws/$ALIAS
-          
-        # $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com 
+          aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com
+        # docker login -u AWS -p $(aws ecr get-login-password --no-include-email --region $REGION) $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com 
         # aws ecr-public get-login-password --region $REGION | docker login --username AWS --password-stdin public.ecr.aws/$ALIAS
 
       - name: public ECR
