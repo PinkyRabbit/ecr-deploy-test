@@ -63,7 +63,7 @@ jobs:
       
       - name: Login to ECR public
         run: |
-          echo ${{ steps.ecr_login.outputs.ecr-login-password }} | docker login public.ecr.aws -u AWS --password-stdin
+          echo ${{ steps.ecr_login.outputs.ecr-login-password }} | docker login public.ecr.aws/${{ env.ecr_public_alias }} -u AWS --password-stdin
 
       - name: public ECR
         env:
