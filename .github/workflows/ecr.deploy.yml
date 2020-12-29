@@ -4,6 +4,7 @@ env:
   aws_region: eu-central-1
   ecr_repository: ${{ github.event.repository.name }}
   dockerfile: "Dockerfile"
+  ecr_public_alias: "w6x7i9z5"
 
 on:
   pull_request:
@@ -27,24 +28,32 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_ECR_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.aws_region }}
 
-      # - name: Login to Amazon ECR
-      #   id: login_to_ecr
-      #   uses: aws-actions/amazon-ecr-login@v1
+
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      env:
+          REGION: ${{ env.aws_region }}
+          ALIAS: ${{ env.ecr_public_alias }}
+      run: |
+        aws ecr-public get-login-password --region $REGION | docker login --username AWS --password-stdin public.ecr.aws/$ALIAS
 
       - name: public ECR
         env:
           IMAGE_TAG: "${{ github.sha }}"
           ECR_REPOSITORY: ${{ env.ecr_repository }}-pub
           DOCKERFILE: ${{ env.dockerfile }}
-          REGION: ${{ env.aws_region }}
-          ALIAS: w6x7i9z5
+          ALIAS: ${{ env.aws_region }}
         run: |
-          aws ecr-public get-login-password --region $REGION | docker login --username AWS --password-stdin public.ecr.aws
           docker build -t $ECR_REPOSITORY:$IMAGE_TAG -f $DOCKERFILE .
           docker tag $ECR_REPOSITORY:$IMAGE_TAG public.ecr.aws/$ALIAS/$ECR_REPOSITORY:$IMAGE_TAG
           docker push public.ecr.aws/$ALIAS/$ECR_REPOSITORY:$IMAGE_TAG
 
       # Private ECR part
+      # - name: Login to Amazon ECR
+      #   id: login_to_ecr
+      #   uses: aws-actions/amazon-ecr-login@v1
+
       # - name: Private ECR
       #   id: build-image
       #   env:
