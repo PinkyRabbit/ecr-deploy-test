@@ -28,15 +28,13 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_ECR_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.aws_region }}
 
-
-
-    - name: Login to Amazon ECR
-      id: login-ecr
-      env:
-          REGION: ${{ env.aws_region }}
-          ALIAS: ${{ env.ecr_public_alias }}
-      run: |
-        aws ecr-public get-login-password --region $REGION | docker login --username AWS --password-stdin public.ecr.aws/$ALIAS
+      - name: Login to Amazon ECR
+        id: login-ecr
+        env:
+            REGION: ${{ env.aws_region }}
+            ALIAS: ${{ env.ecr_public_alias }}
+        run: |
+          aws ecr-public get-login-password --region $REGION | docker login --username AWS --password-stdin public.ecr.aws/$ALIAS
 
       - name: public ECR
         env:
