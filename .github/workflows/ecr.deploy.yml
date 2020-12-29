@@ -17,9 +17,6 @@ jobs:
     name: Upload image to ECR
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -27,11 +24,13 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_ECR_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.aws_region }}
 
-      - name: Install AWS Cli 2.0
-        run: |
-          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-          unzip awscliv2.zip
-          sudo ./aws/install
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Login to Amazon ECR
+        id: login_to_ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
       - name: public ECR
         env:
           IMAGE_TAG: "${{ github.sha }}"
@@ -39,16 +38,11 @@ jobs:
           DOCKERFILE: ${{ env.dockerfile }}
           ALIAS: w6x7i9z5
         run: |
-          aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/$ALIAS
           docker build -t $ECR_REPOSITORY:$IMAGE_TAG -f $DOCKERFILE .
           docker tag $ECR_REPOSITORY:$IMAGE_TAG public.ecr.aws/$ALIAS/$ECR_REPOSITORY:$IMAGE_TAG
           docker push public.ecr.aws/$ALIAS/$ECR_REPOSITORY:$IMAGE_TAG
 
       # Private ECR part
-      # - name: Login to Amazon ECR
-      #   id: login_to_ecr
-      #   uses: aws-actions/amazon-ecr-login@v1
-
       # - name: Private ECR
       #   id: build-image
       #   env:
