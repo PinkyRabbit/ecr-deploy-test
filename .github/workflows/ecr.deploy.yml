@@ -28,6 +28,12 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_ECR_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.aws_region }}
 
+      - name: Install AWS Cli 2.0
+        run: |
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip
+          sudo ./aws/install
+
       - name: Login to Amazon ECR
         id: login-ecr
         env:
@@ -65,3 +71,5 @@ jobs:
       #     docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
       #     docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
       #     echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+
+          
