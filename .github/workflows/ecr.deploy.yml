@@ -7,14 +7,12 @@ env:
   ecr_public_alias: "w6x7i9z5"
 
 on:
-  pull_request:
+  push:
     branches:
-      - deploy
-    types: [closed]
+      - main
 
 jobs:
   deploy:
-    if: github.event.pull_request.merged == true
     name: Upload image to ECR
     runs-on: ubuntu-latest
     steps:
@@ -40,8 +38,7 @@ jobs:
             REGION: ${{ env.aws_region }}
             ALIAS: ${{ env.ecr_public_alias }}
         run: |
-          docker login -u AWS -p $(aws ecr get-login-password --no-include-email --region $REGION) public.ecr.aws/$ALIAS
-        # aws ecr-public get-login-password --region $REGION | docker login --username AWS --password-stdin public.ecr.aws/$ALIAS
+          aws ecr-public get-login-password --region $REGION
 
       - name: public ECR
         env:
